@@ -1,7 +1,7 @@
 import { Collection, Schema, model } from 'mongoose';
 //Movie Interface - defines the structure of a movie document
 
-interface IMovie
+export interface IMovie
 {
     movieID: string,
     title: string,

@@ -13,6 +13,7 @@ import {SanitizeArray} from '../Util';
  */
 export function DisplayMovieList(req: Request, res: Response, next: NextFunction): void
 {
+    console.log("hello")
     Movie.find({})
     .then(function(data)
     {
@@ -145,7 +146,7 @@ export function UpdateMovie(req: Request, res:Response, next: NextFunction): voi
 }
 
 /**
- * The function delets a movie from the database
+ * The function deletes a movie from the database
  * @param req 
  * @param res 
  * @param next 

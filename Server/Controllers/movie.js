@@ -7,6 +7,7 @@ exports.DeleteMovie = exports.UpdateMovie = exports.AddMovie = exports.DisplayMo
 const movie_1 = __importDefault(require("../Models/movie"));
 const Util_1 = require("../Util");
 function DisplayMovieList(req, res, next) {
+    console.log("hello");
     movie_1.default.find({})
         .then(function (data) {
         res.status(200).json({ success: true, msg: "Movie List Retrieved and Displayed", data: data });
