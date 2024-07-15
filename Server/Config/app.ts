@@ -1,49 +1,54 @@
-import express, { NextFunction, Request, Response } from "express";
-import createError, { HttpError } from "http-errors";
-import cookieParser from "cookie-parser";
-import logger from "morgan";
-import indexRouter from "../Routes/index";
-import movieRouter from "../Routes/movie";
-import dotenv from "dotenv";
+import createError, { HttpError } from 'http-errors';
+import express, { NextFunction, Request, Response } from 'express';
+import cookieParser from 'cookie-parser';
+import logger from 'morgan';
+import dotenv from 'dotenv';
 dotenv.config();
 
-//modules for authentication
-import session from "express-session";
-import passport from "passport";
-import passportLocal from "passport-local";
+// modules for authentication
+import session from 'express-session';
+import passport from 'passport';
+import passportLocal from 'passport-local';
 
-//prevent memory leaks with memorystore
-import createMemoryStore from "memorystore";
+// prevent memory leaks with memorystore
+import createMemoryStore from 'memorystore';
 const MemoryStore = createMemoryStore(session);
-// modules for jwt support
-import cors from "cors";
-import passportJWT from "passport-jwt";
 
-//define JWT aliases
-let JWTStrategy = passportJWT.Strategy; //alias
-let ExtractJWT = passportJWT.ExtractJwt; //alias
+// modules for JWT support
+import cors from 'cors';
+import passportJWT from 'passport-jwt';
 
-//define authentication strategy
-//let strategy = passportLocal.Strategy; // Alias
+// define JWT Aliases
+let JWTStrategy = passportJWT.Strategy; // alias
+let ExtractJWT = passportJWT.ExtractJwt; // alias
 
-//import the User Model
-import User from "../Models/user";
+// define authentication strategy
+//let strategy = passportLocal.Strategy; // alias
 
-//import for mongoose and related modules
-import mongoose from "mongoose";
-import db from "./db";
+// import the User Model
+import User from '../Models/user';
 
-mongoose.connect(db.remoteUri);
+// import mongoose and related modules
+import mongoose from 'mongoose';
+import db from './db';
 
-// DB connection events
-mongoose.connection.on("connected", () => {
-  console.log(`Connected to MongoDb Atlas`);
-});
+mongoose.connect(db.remoteURI);
 
-//create an express application
+// DB Connection Events
+mongoose.connection.on('connected', () => {
+  console.log(`Connected to MongoDB Atlas`);
+})
+
+
+import indexRouter from '../Routes/index';
+import movieRouter from '../Routes/movie';
+
+import { dot } from 'node:test/reporters';
+
+// create an express application
 const app = express();
 
-app.use(logger("dev"));
+app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -52,71 +57,73 @@ app.use(cookieParser());
 app.use(cors());
 
 // setup express session
-app.use(
-  session({
-    cookie: { maxAge: 86400000 },
-    store: new MemoryStore({ checkPeriod: 86400000 }),
-    secret: db.secret,
-    saveUninitialized: false,
-    resave: false,
-  })
-);
+app.use(session({
+  cookie: { maxAge: 86400000}, // 1 day in milliseconds
+  store: new MemoryStore({checkPeriod: 86400000}), // 1 day in milliseconds
+  secret: db.secret,
+  saveUninitialized: false,
+  resave: false
+}));
 
-//initialize passport and session
+// initialize passport and session
 app.use(passport.initialize());
 app.use(passport.session());
 
 // implement an authentication strategy
 passport.use(User.createStrategy());
 
-//serialize and deserialize the user info
+// serialize and deserialize the User info
 passport.serializeUser(User.serializeUser() as any);
 passport.deserializeUser(User.deserializeUser());
 
-// setup JWT options
-let jwtOptions = {
+//setup JWT options
+let jwtOptions = 
+{
   jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-  secretOrKey: db.secret,
+  secretOrKey: db.secret
 };
 
-// setup jwt strategy
-
-let strategy = new JWTStrategy(jwtOptions, (jwt_payload, done) => {
-  try {
+// setup JWT Strategy
+let strategy = new JWTStrategy(jwtOptions, (jwt_payload, done) =>
+{
+  try 
+  {
     const user = User.findById(jwt_payload.id);
-
-    if (user) {
+    if (user) 
+    {
       return done(null, user);
-    }
+    } 
     return done(null, false);
-  } catch (error) {
-    return done(error, null);
+
+  } catch (error) 
+  {
+    return done(error, null);  
   }
 });
 
+// deploy the strategy
 passport.use(strategy);
-app.use("/api", indexRouter);
-app.use("/api/movie", movieRouter);
+
+app.use('/api', indexRouter);
+/* Example: Secure the movie routes with JWT authentication */
+//app.use('/api/movie', passport.authenticate('jwt', {session: false}), movieRouter);
+app.use('/api/movie', movieRouter);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function (
-  err: HttpError,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+app.use(function(err: HttpError, req:Request, res:Response, next:NextFunction) 
+{
   // set locals, only providing error in development
   res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
   res.status(err.status || 500);
-  res.end("error - please use /api as a route prefix for your API requests");
+  res.end('error - please use /api as a route prefix for your API requests');
 });
 
 export default app;

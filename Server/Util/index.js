@@ -3,29 +3,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GenerateToken = exports.SanitizedArray = void 0;
+exports.SanitizeArray = SanitizeArray;
+exports.GenerateToken = GenerateToken;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = __importDefault(require("../Config/db"));
-function SanitizedArray(inputString) {
-    let unsanitizedArray = inputString.split(",");
-    let sanitizedArray = Array();
-    for (const unsanitizedString of unsanitizedArray) {
-        sanitizedArray.push(unsanitizedString.trim());
+function SanitizeArray(inputString) {
+    if (Array.isArray(inputString)) {
+        return inputString.map((value) => value.trim());
     }
-    return sanitizedArray;
+    else if (typeof inputString === 'string') {
+        return inputString.split(",").map((value) => value.trim());
+    }
+    else {
+        console.error("Invalid input type");
+        return [];
+    }
 }
-exports.SanitizedArray = SanitizedArray;
 function GenerateToken(user) {
     const payload = {
         id: user.id,
         DisplayName: user.displayName,
         username: user.username,
-        EmailAddress: user.emailAddress,
+        EmailAddress: user.emailAddress
     };
     const jwtOptions = {
-        expiresIn: 604800,
+        expiresIn: 604800
     };
     return jsonwebtoken_1.default.sign(payload, db_1.default.secret, jwtOptions);
 }
-exports.GenerateToken = GenerateToken;
 //# sourceMappingURL=index.js.map

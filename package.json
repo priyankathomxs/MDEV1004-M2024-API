@@ -1,5 +1,5 @@
 {
-  "name": "mdev-m2024-api",
+  "name": "ice7",
   "version": "0.0.7",
   "private": true,
   "scripts": {
@@ -36,6 +36,7 @@
     "@types/node": "^20.12.12",
     "@types/passport": "^1.0.16",
     "@types/passport-jwt": "^4.0.1",
-    "@types/passport-local": "^1.0.38"
+    "@types/passport-local": "^1.0.38",
+    "@types/passport-local-mongoose": "^6.1.5"
   }
 }

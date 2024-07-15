@@ -32,28 +32,28 @@ const userSchema = new mongoose_1.Schema({
     username: {
         type: String,
         required: true,
-        unique: true,
+        unique: true
     },
     emailAddress: {
         type: String,
-        required: true,
+        required: true
     },
     displayName: {
         type: String,
-        required: true,
+        required: true
     },
     created: {
         type: Date,
-        default: Date.now(),
+        default: Date.now()
     },
     updated: {
         type: Date,
-        default: Date.now(),
-    },
+        default: Date.now()
+    }
 }, {
-    collection: "users",
+    collection: 'users'
 });
 userSchema.plugin(passport_local_mongoose_1.default);
-const User = mongoose_1.default.model("User", userSchema);
+const User = mongoose_1.default.model('User', userSchema);
 exports.default = User;
 //# sourceMappingURL=user.js.map
